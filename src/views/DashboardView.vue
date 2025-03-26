@@ -1,14 +1,18 @@
 <template>
   <v-container>
-    <div class="d-flex justify-space-between flex-column flex-sm-row">
-      <h1>Product Dashboard</h1>
-      <v-btn color="success" class="mb-4" @click="showAddForm">Add New Product</v-btn>
-    </div>
+    <v-row class="mb-4" align="center" justify="space-between">
+      <v-col cols="12" sm="auto">
+        <h1>{{ $t('dashboard') }}</h1>
+      </v-col>
+      <v-col cols="12" sm="auto">
+        <v-btn color="success" @click="showAddForm">{{ $t('addProduct') }}</v-btn>
+      </v-col>
+    </v-row>
 
     <!-- Add Product Dialog -->
     <v-dialog v-model="showAddDialog" max-width="600">
       <v-card>
-        <v-card-title>Add Product</v-card-title>
+        <v-card-title>{{ $t('addProduct') }}</v-card-title>
         <v-card-text>
           <product-form @submit="hideAddForm" />
         </v-card-text>
@@ -18,7 +22,7 @@
     <!-- Edit Product Dialog -->
     <v-dialog v-model="showEditDialog" max-width="600">
       <v-card>
-        <v-card-title>Edit Product</v-card-title>
+        <v-card-title>{{ $t('editProduct') }}</v-card-title>
         <v-card-text>
           <product-form :initial-product="initialProduct" @submit="updateProduct" />
         </v-card-text>

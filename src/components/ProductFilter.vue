@@ -1,10 +1,13 @@
+<!-- src/components/ProductFilter.vue -->
 <template>
   <v-row class="mb-4">
     <v-col cols="12" sm="4">
       <v-select
         v-model="localFilters.category"
         :items="categoryOptions"
-        label="Filter by Category"
+        item-title="title"
+        item-value="value"
+        :label="$t('filterByCategory')"
         prepend-icon="mdi-filter"
       />
     </v-col>
@@ -12,7 +15,9 @@
       <v-select
         v-model="localFilters.sortBy"
         :items="sortByOptions"
-        label="Sort By"
+        item-title="title"
+        item-value="value"
+        :label="$t('sortBy')"
         prepend-icon="mdi-sort"
       />
     </v-col>
@@ -20,7 +25,9 @@
       <v-select
         v-model="localFilters.sortOrder"
         :items="sortOrderOptions"
-        label="Sort Order"
+        item-title="title"
+        item-value="value"
+        :label="$t('sortOrder')"
         prepend-icon="mdi-sort-variant"
       />
     </v-col>
@@ -28,10 +35,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed } from 'vue'
 import { useProductStore } from '@/stores/productStore'
+import { useI18n } from 'vue-i18n'
 
-defineProps<{
+const { t } = useI18n()
+
+const props = defineProps<{
   modelValue: {
     category: string
     sortBy: 'price' | 'name'
@@ -39,54 +49,36 @@ defineProps<{
   }
 }>()
 
-// Define emits for v-model updates
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: typeof filters.value): void
+  (e: 'update:modelValue', value: typeof localFilters.value): void
 }>()
 
 const productStore = useProductStore()
 const { categories } = productStore
 
-const categoryOptions = ref([
-  { title: 'All', value: '' },
-  ...categories.map((category) => ({ title: category, value: category })),
-])
-
-const filters = ref({
-  category: '',
-  sortBy: 'price' as const,
-  sortOrder: 'asc' as const,
-})
-
-// Two-way binding with localFilters
-const localFilters = ref({ ...filters.value })
-
-// Sync prop changes to local state
-watch(
-  () => filters.value,
-  (newValue) => {
+// Local filters for two-way binding
+const localFilters = computed({
+  get() {
+    return props.modelValue
+  },
+  set(newValue) {
     emit('update:modelValue', newValue)
   },
-  { deep: true },
-)
+})
 
-// Sync local state with filter changes
-watch(
-  () => localFilters.value,
-  (newValue) => {
-    filters.value = { ...newValue }
-  },
-  { deep: true },
-)
+// Reactive options that update with language changes
+const categoryOptions = computed(() => [
+  { title: t('all'), value: '' },
+  ...categories.map((category) => ({ title: t(category.toLowerCase()), value: category })),
+])
 
-// Options for sort selects
-const sortByOptions = [
-  { title: 'Price', value: 'price' },
-  { title: 'Name', value: 'name' },
-]
+const sortByOptions = computed(() => [
+  { title: t('price'), value: 'price' },
+  { title: t('name'), value: 'name' },
+])
 
-const sortOrderOptions = [
-  { title: 'Ascending', value: 'asc' },
-  { title: 'Descending', value: 'desc' },
-]
+const sortOrderOptions = computed(() => [
+  { title: t('ascending'), value: 'asc' },
+  { title: t('descending'), value: 'desc' },
+])
 </script>

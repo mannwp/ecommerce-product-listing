@@ -26,7 +26,7 @@ const filters = ref({
 const filteredProducts = computed(() => {
   let result = [...productStore.products]
 
-  if (filters.value.category !== '') {
+  if (filters.value.category) {
     result = result.filter((p) => p.category === filters.value.category)
   }
 

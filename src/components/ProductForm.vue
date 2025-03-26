@@ -1,23 +1,25 @@
 <template>
   <v-form v-model="formValid" @submit.prevent="submitForm" ref="formRef">
-    <v-text-field v-model="form.name" label="Product Name" :rules="nameRules" required />
+    <v-text-field v-model="form.name" :label="$t('name')" :rules="nameRules" required />
     <v-text-field
       v-model.number="form.price"
-      label="Price"
+      :label="$t('price')"
       type="number"
       :rules="priceRules"
       required
     />
     <v-select
       v-model="form.category"
-      :items="categories"
-      label="Category"
+      :items="translatedCategories"
+      item-title="text"
+      item-value="value"
+      :label="$t('category')"
       :rules="requiredRule"
       required
     />
     <v-file-input
       v-model="imageFile"
-      label="Product Image"
+      :label="$t('image')"
       accept="image/*"
       prepend-icon="mdi-camera"
       variant="filled"
@@ -27,13 +29,15 @@
     <v-img v-if="imagePreview" :src="imagePreview" max-height="200" class="my-2" />
     <v-select
       v-model="form.stockStatus"
-      :items="stockOptions"
-      label="Stock Status"
+      :items="translatedStockOptions"
+      item-title="text"
+      item-value="value"
+      :label="$t('stockStatus')"
       :rules="requiredRule"
       required
     />
     <v-btn type="submit" color="success" class="w-100" :disabled="!formValid">
-      {{ initialProduct ? 'Update Product' : 'Add Product' }}
+      {{ initialProduct ? $t('editProduct') : $t('addProduct') }}
     </v-btn>
   </v-form>
 </template>
@@ -41,9 +45,11 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import { useProductStore } from '@/stores/productStore'
+import { useI18n } from 'vue-i18n'
 import type { VForm } from 'vuetify/components'
-import type { Product } from '@/types/product'
+import type { Product } from '../types/product'
 
+const { t } = useI18n()
 const emit = defineEmits<{
   (e: 'submit', updatedProduct: Product): void
 }>()
@@ -62,20 +68,26 @@ const form = ref<Product>({
 
 const imageFile = ref<File | null>(null)
 const imagePreview = ref('')
-const stockOptions = ['In Stock', 'Out of Stock'] as const
 const formValid = ref(false)
 const formRef = ref<VForm | null>(null)
 
-const requiredRule = [(v: unknown) => !!v || 'Required']
-const nameRules = [...requiredRule, (v: string) => v.length <= 100 || 'Max 100 characters']
-const priceRules = [...requiredRule, (v: number) => v > 0 || 'Must be positive']
+// Translated select options
+const translatedCategories = computed(() =>
+  categories.map((cat) => ({
+    text: t(cat.toLowerCase()),
+    value: cat,
+  })),
+)
+const translatedStockOptions = computed(() => [
+  { text: t('inStock'), value: 'In Stock' },
+  { text: t('outOfStock'), value: 'Out of Stock' },
+])
+// Validation rules with translated messages
+const requiredRule = [(v: unknown) => !!v || t('required')]
+const nameRules = [...requiredRule, (v: string) => v.length <= 100 || t('max100')]
+const priceRules = [...requiredRule, (v: number) => v > 0 || t('positive')]
 const computedImageRules = computed(() => [
-  (v: File | null) => {
-    if (initialProduct) {
-      return !!v || !!form.value.image || 'Image is required'
-    }
-    return !!v || 'Image is required'
-  },
+  (v: File | null) => (initialProduct ? !!v || !!form.value.image : !!v) || t('imageRequired'),
 ])
 
 watch(
@@ -104,13 +116,12 @@ const handleFileInput = async (files: File | File[] | null) => {
   }
 }
 
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve) => {
+const fileToBase64 = (file: File): Promise<string> =>
+  new Promise((resolve) => {
     const reader = new FileReader()
     reader.onload = () => resolve(reader.result as string)
     reader.readAsDataURL(file)
   })
-}
 
 const submitForm = async () => {
   const { valid } = await formRef.value!.validate()
