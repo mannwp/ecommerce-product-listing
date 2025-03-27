@@ -21,12 +21,13 @@
                 :rules="passwordRules"
                 required
               />
-              <v-text-field
-                v-model="profilePictureUrl"
-                :label="$t('profilePictureUrl')"
-                type="url"
-                :rules="urlRules"
-                placeholder="https://example.com/image.jpg"
+              <v-file-input
+                v-model="profilePicture"
+                :label="$t('profilePicture')"
+                accept="image/*"
+                prepend-icon="mdi-camera"
+                variant="filled"
+                :rules="imageRules"
               />
               <v-btn
                 type="submit"
@@ -76,7 +77,7 @@ const router = useRouter()
 
 const email = ref('')
 const password = ref('')
-const profilePictureUrl = ref('')
+const profilePicture = ref<File | null>(null) // Changed from File[] to File
 const formValid = ref(false)
 const formRef = ref<VForm | null>(null)
 const loading = ref(false)
@@ -91,10 +92,27 @@ const passwordRules = [
   (v: string) => !!v || t('required'),
   (v: string) => v.length >= 6 || t('passwordMinLength'),
 ]
-const urlRules = [
-  (v: string) =>
-    !v || /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|svg|webp))$/i.test(v) || t('invalidImageUrl'),
+const imageRules = [
+  (v: File | null) => {
+    if (!v) return true // No file selected, validation passes
+    return v.size <= 2 * 1024 * 1024 || t('imageSizeLimit') // 2MB limit
+  },
+  (v: File | null) => {
+    if (!v) return true // No file selected, validation passes
+    return v.type.startsWith('image/') || t('imageType')
+  },
 ]
+
+// Convert file to Base64 string
+const toBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = (error) => reject(error)
+  })
+}
+
 const signUp = async () => {
   const { valid } = await formRef.value!.validate()
   if (valid) {
@@ -102,16 +120,26 @@ const signUp = async () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value)
       const user = userCredential.user
+
+      // Convert profile picture to Base64 if provided
+      let images: string[] = []
+      if (profilePicture.value) {
+        // Changed from profilePicture.value.length > 0
+        const base64String = await toBase64(profilePicture.value)
+        images = [base64String]
+      }
+
+      // Save user data to Firestore
       await setDoc(doc(db, 'users', user.uid), {
         email: email.value,
         role: 'user',
-        profilePicture: profilePictureUrl.value || null, // Store the URL or null if not provided
+        images, // Store as an array of Base64 strings
       })
+
       router.push('/dashboard')
     } catch (error) {
       console.error('Sign-up error:', error)
-      const firebaseError = error as { code: string }
-      errorMessage.value = getErrorMessage(firebaseError.code)
+      errorMessage.value = getErrorMessage((error as { code: string }).code)
       showError.value = true
     } finally {
       loading.value = false

@@ -110,7 +110,8 @@ onMounted(() => {
           if (docSnap.exists()) {
             const userData = docSnap.data()
             userRole.value = userData.role
-            userProfilePicture.value = userData.profilePicture || null
+            userProfilePicture.value =
+              userData.images && userData.images.length > 0 ? userData.images[0] : null
           } else {
             userRole.value = null
             userProfilePicture.value = null
