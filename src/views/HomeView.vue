@@ -17,15 +17,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useProductStore } from '../stores/productStore'
 import ProductCard from '../components/ProductCard.vue'
 import ProductFilter from '../components/ProductFilter.vue'
-// import { useI18n } from 'vue-i18n';
-
-// const { t } = useI18n();
+import { auth } from '../firebase'
+import { onAuthStateChanged } from 'firebase/auth'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const { t } = useI18n()
 const productStore = useProductStore()
-
+const { products, fetchProducts } = productStore
 const filters = ref({
   category: '',
   sortBy: 'price' as 'price' | 'name',
@@ -33,7 +36,7 @@ const filters = ref({
 })
 
 const filteredProducts = computed(() => {
-  let result = [...productStore.products]
+  let result = products.value
 
   if (filters.value.category) {
     result = result.filter((p) => p.category === filters.value.category)
@@ -44,6 +47,28 @@ const filteredProducts = computed(() => {
     return filters.value.sortBy === 'price'
       ? multiplier * (a.price - b.price)
       : multiplier * a.name.localeCompare(b.name)
+  })
+})
+const loading = ref(false)
+const error = ref<string | null>(null)
+onMounted(async () => {
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      // User is authenticated, fetch products
+      loading.value = true
+      error.value = null
+      try {
+        await fetchProducts()
+      } catch (err) {
+        error.value = t('fetchProductsError')
+        console.error('Error fetching products:', err)
+      } finally {
+        loading.value = false
+      }
+    } else {
+      // User is not authenticated, redirect to login
+      router.push('/login')
+    }
   })
 })
 </script>

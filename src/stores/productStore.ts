@@ -1,34 +1,61 @@
-import { defineStore } from 'pinia'
+// src/store/productStore.ts
 import { ref } from 'vue'
-import type { Product } from '@/types/product'
+import { db } from '../firebase'
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore'
+import type { Product } from '../types/product'
 
-export const useProductStore = defineStore(
-  'product',
-  () => {
-    const products = ref<Product[]>([])
-    const categories = ref(['Electronics', 'Clothing', 'Books', 'Home'] as const)
+export const useProductStore = () => {
+  const products = ref<Product[]>([])
+  const categories = ref<string[]>(['Electronics', 'Clothing', 'Books', 'Home'])
 
-    const addProduct = (product: Omit<Product, 'id'>) => {
-      products.value.push({
-        ...product,
-        id: Math.random().toString(36).substring(2, 9),
-      })
+  const fetchProducts = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'products'))
+      products.value = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Product[]
+    } catch (error) {
+      console.error('Error fetching products:', error)
     }
+  }
 
-    const removeProduct = (id: string) => {
-      products.value = products.value.filter((p) => p.id !== id)
-    }
-
-    const updateProduct = (updatedProduct: Product) => {
-      const index = products.value.findIndex((p) => p.id === updatedProduct.id)
-      if (index !== -1) {
-        products.value[index] = { ...updatedProduct }
+  const addOrUpdate = async (product: Product) => {
+    try {
+      if (product.id) {
+        // Update existing product
+        const productRef = doc(db, 'products', product.id)
+        // Remove the id field from the data to be updated
+        const { ...productData } = product
+        await updateDoc(productRef, productData)
+      } else {
+        // Add new product
+        const { ...productData } = product // Ensure id is not included in the new document
+        const newProductRef = await addDoc(collection(db, 'products'), productData)
+        product.id = newProductRef.id
       }
+      await fetchProducts() // Refresh the product list
+    } catch (error) {
+      console.error('Error adding/updating product:', error)
+      throw error
     }
+  }
 
-    return { products, categories, addProduct, removeProduct, updateProduct }
-  },
-  {
-    persist: true,
-  },
-)
+  const deleteProduct = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'products', id))
+      await fetchProducts()
+    } catch (error) {
+      console.error('Error deleting product:', error)
+      throw error
+    }
+  }
+
+  return {
+    products,
+    categories,
+    fetchProducts,
+    addOrUpdate,
+    deleteProduct,
+  }
+}

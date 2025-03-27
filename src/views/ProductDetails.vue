@@ -1,56 +1,48 @@
 <!-- src/views/ProductDetails.vue -->
 <template>
   <v-container class="modern-container">
-    <v-row>
-      <!-- Image Carousel Section -->
-      <v-col cols="12" md="6">
-        <v-card elevation="4" class="image-card">
-          <v-carousel
-            v-if="product?.images?.length"
-            :show-arrows="product.images.length > 1"
-            hide-delimiters
-            height="400"
-            class="modern-carousel"
-          >
-            <v-carousel-item
-              v-for="(image, index) in product?.images || []"
-              :key="index"
-              :src="image"
-            >
-              <!-- <v-img :src="image" height="400" class="rounded-image" /> -->
-            </v-carousel-item>
-          </v-carousel>
-          <v-img
-            v-else
-            src="https://via.placeholder.com/300x200?text=No+Image"
-            height="400"
-            class="rounded-image"
-          />
-        </v-card>
+    <h1 class="page-title">{{ $t('productDetails') }}</h1>
+    <v-row v-if="loading">
+      <v-col cols="12">
+        <v-progress-circular indeterminate color="primary" :size="50" class="d-block mx-auto" />
       </v-col>
-
-      <!-- Product Details Section -->
+    </v-row>
+    <v-row v-else-if="error">
+      <v-col cols="12">
+        <v-alert type="error" class="text-center">
+          {{ error }}
+        </v-alert>
+      </v-col>
+    </v-row>
+    <v-row v-else-if="!product">
+      <v-col cols="12">
+        <v-alert type="info" class="text-center">
+          {{ $t('productNotFound') }}
+        </v-alert>
+      </v-col>
+    </v-row>
+    <v-row v-else>
       <v-col cols="12" md="6">
-        <v-card elevation="2" class="details-card pa-6">
-          <h1 class="product-title">{{ product?.name }}</h1>
-          <v-chip
-            class="stock-chip mb-4"
-            :class="product?.stockStatus === 'In Stock' ? 'in-stock' : 'out-of-stock'"
-            small
-          >
-            {{ $t(product?.stockStatus === 'In Stock' ? 'inStock' : 'outOfStock') }}
-          </v-chip>
-          <div class="price-section mb-4">
-            <span class="price-label">{{ $t('price') }}:</span>
-            <span class="price-value">${{ product?.price }}</span>
-          </div>
-          <div class="category-section mb-6">
-            <span class="category-label">{{ $t('category') }}:</span>
-            <span class="category-value">{{ $t((product?.category || '').toLowerCase()) }}</span>
-          </div>
-          <v-btn color="success" class="back-button" :to="{ name: 'home' }" elevation="2">
-            {{ $t('backToListing') }}
-          </v-btn>
+        <v-carousel hide-delimiters height="400" class="rounded-lg">
+          <v-carousel-item
+            v-for="(image, index) in product.images"
+            :key="index"
+            :src="image"
+            class="carousel-item"
+          />
+        </v-carousel>
+      </v-col>
+      <v-col cols="12" md="6">
+        <v-card class="product-details-card" elevation="4">
+          <v-card-title class="product-title">{{ product.name }}</v-card-title>
+          <v-card-subtitle class="product-subtitle">
+            ${{ product.price }} | {{ $t(product.category.toLowerCase()) }}
+          </v-card-subtitle>
+          <v-card-text>
+            <v-chip :class="product.stockStatus === 'In Stock' ? 'in-stock' : 'out-of-stock'">
+              {{ $t(product.stockStatus === 'In Stock' ? 'inStock' : 'outOfStock') }}
+            </v-chip>
+          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -58,77 +50,81 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-import { useProductStore } from '../stores/productStore'
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { auth, db } from '../firebase'
+import { onAuthStateChanged } from 'firebase/auth'
+import { doc, getDoc } from 'firebase/firestore'
+import type { Product } from '../types/product'
 
+const { t } = useI18n()
 const route = useRoute()
-const productStore = useProductStore()
-const product = computed(() => productStore.products.find((p) => p.id === route.params.id))
+const router = useRouter()
+const product = ref<Product | null>(null)
+const loading = ref(false)
+const error = ref<string | null>(null)
+
+onMounted(async () => {
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      // User is authenticated, fetch the product
+      const productId = route.params.id as string
+      if (productId) {
+        loading.value = true
+        error.value = null
+        try {
+          const productDocRef = doc(db, 'products', productId)
+          const productDoc = await getDoc(productDocRef)
+          if (productDoc.exists()) {
+            product.value = { id: productDoc.id, ...productDoc.data() } as Product
+          } else {
+            product.value = null // Product not found
+          }
+        } catch (err) {
+          error.value = t('fetchProductError')
+          console.error('Error fetching product:', err)
+        } finally {
+          loading.value = false
+        }
+      } else {
+        error.value = t('invalidProductId')
+        loading.value = false
+      }
+    } else {
+      // User is not authenticated, redirect to login
+      router.push('/login')
+    }
+  })
+})
 </script>
 
 <style scoped>
-/* Modern Container */
 .modern-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
 }
 
-/* Image Card */
-.image-card {
-  border-radius: 12px;
-  overflow: hidden;
-  transition: transform 0.3s ease;
-}
-
-.rounded-image {
-  border-radius: 8px;
-}
-
-/* Thumbnails */
-.thumbnail-col {
-  padding: 0.25rem;
-}
-
-.thumbnail {
-  border-radius: 6px;
-  cursor: pointer;
-  transition:
-    opacity 0.3s ease,
-    border 0.3s ease;
-  opacity: 0.6;
-  border: 2px solid transparent;
-}
-
-.thumbnail:hover {
-  opacity: 1;
-}
-
-.active-thumbnail {
-  opacity: 1;
-  border: 2px solid #4caf50;
-}
-
-/* Details Card */
-.details-card {
-  border-radius: 12px;
-  background: linear-gradient(145deg, backround, forground);
-  transition: transform 0.3s ease;
-}
-
-/* Product Title */
-.product-title {
+.page-title {
   font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 1rem;
-  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  text-align: start;
 }
 
-/* Stock Chip */
-.stock-chip {
+.product-details-card {
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+.product-title {
+  font-size: 1.75rem;
   font-weight: 600;
-  transition: background-color 0.3s ease;
+}
+
+.product-subtitle {
+  font-size: 1.1rem;
 }
 
 .in-stock {
@@ -141,59 +137,25 @@ const product = computed(() => productStore.products.find((p) => p.id === route.
   color: white;
 }
 
-/* Price and Category Sections */
-.price-section,
-.category-section {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.carousel-item {
+  border-radius: 12px;
 }
 
-.price-label,
-.category-label {
-  font-size: 1.1rem;
-  font-weight: 500;
-}
-
-.price-value,
-.category-value {
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-/* Back Button */
-.back-button {
-  border-radius: 8px;
-  text-transform: none;
-  font-weight: 600;
-  padding: 0.5rem 1.5rem;
-  background: linear-gradient(90deg, #4caf50, #66bb6a);
-  transition:
-    background 0.3s ease,
-    transform 0.2s ease;
-}
-
-.back-button:hover {
-  background: linear-gradient(90deg, #66bb6a, #4caf50);
-  transform: translateY(-2px);
-}
-
-/* Responsive Adjustments */
 @media (max-width: 600px) {
-  .product-title {
-    font-size: 1.5rem;
-  }
-
   .modern-container {
     padding: 1rem;
   }
 
-  .details-card {
-    padding: 1rem;
+  .page-title {
+    font-size: 1.5rem;
   }
 
-  .back-button {
-    width: 100%;
+  .product-title {
+    font-size: 1.5rem;
+  }
+
+  .product-subtitle {
+    font-size: 0.95rem;
   }
 }
 </style>

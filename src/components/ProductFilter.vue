@@ -72,7 +72,7 @@ const localFilters = computed({
 // Reactive options that update with language changes
 const categoryOptions = computed(() => [
   { title: t('all'), value: '' },
-  ...categories.map((category) => ({ title: t(category.toLowerCase()), value: category })),
+  ...categories.value.map((category) => ({ title: t(category.toLowerCase()), value: category })),
 ])
 
 const sortByOptions = computed(() => [
