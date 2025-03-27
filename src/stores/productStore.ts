@@ -11,7 +11,7 @@ export const useProductStore = defineStore(
     const addProduct = (product: Omit<Product, 'id'>) => {
       products.value.push({
         ...product,
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random().toString(36).substring(2, 9),
       })
     }
 

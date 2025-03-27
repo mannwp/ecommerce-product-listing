@@ -27,5 +27,8 @@
   "home": "Home",
   "currencySymbol": "₹",
   "delete": "Delete",
-  "edit": "Edit"
+  "edit": "Edit",
+  "imageSizeLimit": "Image must be less than 2MB",
+  "imageType": "File must be an image",
+  "backToListing": "Back to Listing"
 }

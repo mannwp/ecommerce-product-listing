@@ -1,9 +1,16 @@
+<!-- src/views/ProductListing.vue -->
 <template>
-  <v-container>
-    <product-filter v-model="filters" />
+  <v-container class="modern-container">
+    <h1 class="page-title">{{ $t('listing') }}</h1>
+    <product-filter v-model="filters" class="filter-section" />
     <v-row>
       <v-col v-for="product in filteredProducts" :key="product.id" cols="12" sm="6" md="4">
-        <product-card :product="product" />
+        <router-link
+          :to="{ name: 'product-details', params: { id: product.id } }"
+          class="text-decoration-none"
+        >
+          <product-card :product="product" />
+        </router-link>
       </v-col>
     </v-row>
   </v-container>
@@ -11,10 +18,12 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useProductStore } from '@/stores/productStore'
-import ProductCard from '@/components/ProductCard.vue'
-import ProductFilter from '@/components/ProductFilter.vue'
+import { useProductStore } from '../stores/productStore'
+import ProductCard from '../components/ProductCard.vue'
+import ProductFilter from '../components/ProductFilter.vue'
+// import { useI18n } from 'vue-i18n';
 
+// const { t } = useI18n();
 const productStore = useProductStore()
 
 const filters = ref({
@@ -38,3 +47,36 @@ const filteredProducts = computed(() => {
   })
 })
 </script>
+
+<style scoped>
+/* Modern Container */
+.modern-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Page Title */
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: start;
+}
+
+/* Filter Section */
+.filter-section {
+  margin-bottom: 2rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+  .modern-container {
+    padding: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+}
+</style>

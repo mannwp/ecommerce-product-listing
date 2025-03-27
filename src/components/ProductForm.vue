@@ -31,15 +31,20 @@
       required
     />
     <v-file-input
-      v-model="imageFile"
+      v-model="imageFiles"
       :label="$t('image')"
       accept="image/*"
       prepend-icon="mdi-camera"
-      variant="outlined"
+      variant="filled"
+      multiple
       @update:modelValue="handleFileInput"
       :rules="computedImageRules"
     />
-    <v-img v-if="imagePreview" :src="imagePreview" max-height="200" class="my-2" />
+    <v-row v-if="imagePreviews.length" class="my-2">
+      <v-col v-for="(preview, index) in imagePreviews" :key="index" cols="4">
+        <v-img :src="preview" max-height="100" />
+      </v-col>
+    </v-row>
     <v-select
       variant="outlined"
       v-model="form.stockStatus"
@@ -70,21 +75,18 @@ const emit = defineEmits<{
 
 const productStore = useProductStore()
 const { categories } = productStore
-
 const form = ref<Product>({
   id: '',
   name: '',
   price: 0,
   category: 'Electronics',
-  image: '',
+  images: [],
   stockStatus: 'In Stock',
 })
-
-const imageFile = ref<File | null>(null)
-const imagePreview = ref('')
+const imageFiles = ref<File[]>([])
+const imagePreviews = ref<string[]>([])
 const formValid = ref(false)
 const formRef = ref<VForm | null>(null)
-
 // Translated select options
 const translatedCategories = computed(() =>
   categories.map((cat) => ({
@@ -101,35 +103,44 @@ const requiredRule = [(v: unknown) => !!v || t('required')]
 const nameRules = [...requiredRule, (v: string) => v.length <= 100 || t('max100')]
 const priceRules = [...requiredRule, (v: number) => v > 0 || t('positive')]
 const computedImageRules = computed(() => [
-  (v: File | null) => (initialProduct ? !!v || !!form.value.image : !!v) || t('imageRequired'),
+  // Ensure at least one image is present (either uploaded or already in form.images)
+  () =>
+    (imageFiles.value && imageFiles.value.length > 0) ||
+    form.value.images.length > 0 ||
+    t('imageRequired'),
+  // Validate image size (2MB limit)
+  (v: File[] | null) =>
+    !v || v.every((file) => file.size <= 2 * 1024 * 1024) || t('imageSizeLimit'),
+  // Validate image type
+  (v: File[] | null) => !v || v.every((file) => file.type.startsWith('image/')) || t('imageType'),
 ])
-
 watch(
   () => initialProduct,
   (newProduct) => {
     if (newProduct) {
       form.value = { ...newProduct }
-      imagePreview.value = newProduct.image
-      imageFile.value = null
+      imagePreviews.value = newProduct.images || []
+      imageFiles.value = []
     }
   },
   { immediate: true },
 )
 
 const handleFileInput = async (files: File | File[] | null) => {
-  const file = Array.isArray(files) ? files[0] : files
-  if (file) {
-    imagePreview.value = URL.createObjectURL(file)
-    form.value.image = await fileToBase64(file)
-  } else if (initialProduct?.image && !imageFile.value) {
-    imagePreview.value = initialProduct.image
-    form.value.image = initialProduct.image
+  if (files instanceof File) {
+    files = [files]
+  }
+  if (files && files.length > 0) {
+    imagePreviews.value = await Promise.all(files.map((file) => fileToBase64(file)))
+    form.value.images = imagePreviews.value
+  } else if (initialProduct?.images && !imageFiles.value.length) {
+    imagePreviews.value = initialProduct.images
+    form.value.images = initialProduct.images
   } else {
-    imagePreview.value = ''
-    form.value.image = ''
+    imagePreviews.value = []
+    form.value.images = []
   }
 }
-
 const fileToBase64 = (file: File): Promise<string> =>
   new Promise((resolve) => {
     const reader = new FileReader()
@@ -149,10 +160,9 @@ const submitForm = async () => {
       emit('submit', { ...form.value, id: Math.random().toString(36).substr(2, 9) } as Product)
     }
     formRef.value!.reset()
-    imagePreview.value = ''
+    imagePreviews.value = []
   }
 }
-
 const { initialProduct } = defineProps<{
   initialProduct?: Product
 }>()

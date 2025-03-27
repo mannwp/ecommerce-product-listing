@@ -3,6 +3,6 @@ export interface Product {
   name: string
   price: number
   category: 'Electronics' | 'Clothing' | 'Books' | 'Home'
-  image: string
+  images: string[]
   stockStatus: 'In Stock' | 'Out of Stock'
 }

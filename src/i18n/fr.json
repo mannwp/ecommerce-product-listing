@@ -27,5 +27,8 @@
   "home": "Maison",
   "currencySymbol": "€",
   "delete": "Supprimer",
-  "edit": "Modifier"
+  "edit": "Modifier",
+  "imageSizeLimit": "L'image doit être inférieure à 2 Mo",
+  "imageType": "Le fichier doit être une image",
+  "backToListing": "Retour à la liste"
 }
