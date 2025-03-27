@@ -3,6 +3,7 @@
   <v-row class="mb-4">
     <v-col cols="12" sm="4">
       <v-select
+        variant="outlined"
         v-model="localFilters.category"
         :items="categoryOptions"
         item-title="title"
@@ -13,6 +14,7 @@
     </v-col>
     <v-col cols="12" sm="4">
       <v-select
+        variant="outlined"
         v-model="localFilters.sortBy"
         :items="sortByOptions"
         item-title="title"
@@ -23,6 +25,7 @@
     </v-col>
     <v-col cols="12" sm="4">
       <v-select
+        variant="outlined"
         v-model="localFilters.sortOrder"
         :items="sortOrderOptions"
         item-title="title"

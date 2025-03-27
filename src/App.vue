@@ -34,6 +34,7 @@ watch(currentLanguage, (newLang) => {
         </div>
         <div class="d-flex ga-4 justify-center align-center">
           <v-select
+            variant="outlined"
             v-model="currentLanguage"
             :items="languageOptions"
             item-title="title"

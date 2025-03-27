@@ -1,7 +1,19 @@
 <template>
-  <v-form v-model="formValid" @submit.prevent="submitForm" ref="formRef">
-    <v-text-field v-model="form.name" :label="$t('name')" :rules="nameRules" required />
+  <v-form
+    v-model="formValid"
+    @submit.prevent="submitForm"
+    ref="formRef"
+    class="d-flex flex-column ga-2"
+  >
     <v-text-field
+      variant="outlined"
+      v-model="form.name"
+      :label="$t('name')"
+      :rules="nameRules"
+      required
+    />
+    <v-text-field
+      variant="outlined"
       v-model.number="form.price"
       :label="$t('price')"
       type="number"
@@ -9,6 +21,7 @@
       required
     />
     <v-select
+      variant="outlined"
       v-model="form.category"
       :items="translatedCategories"
       item-title="text"
@@ -22,12 +35,13 @@
       :label="$t('image')"
       accept="image/*"
       prepend-icon="mdi-camera"
-      variant="filled"
+      variant="outlined"
       @update:modelValue="handleFileInput"
       :rules="computedImageRules"
     />
     <v-img v-if="imagePreview" :src="imagePreview" max-height="200" class="my-2" />
     <v-select
+      variant="outlined"
       v-model="form.stockStatus"
       :items="translatedStockOptions"
       item-title="text"
