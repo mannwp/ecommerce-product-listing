@@ -4,7 +4,7 @@ import Home from '../views/HomeView.vue'
 import ProductDetails from '../views/ProductDetails.vue'
 // import ProductForm from '../components/ProductForm.vue';
 import Dashboard from '../views/DashboardView.vue'
-import SignUp from '../views/Signup.vue'
+import SignUp from '@/views/SignUp.vue'
 import Login from '../views/Login.vue'
 import { auth, db } from '../firebase'
 import { onAuthStateChanged } from 'firebase/auth'

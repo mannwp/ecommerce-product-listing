@@ -75,7 +75,7 @@ const productStore = useProductStore()
 const { categories } = productStore
 
 const form = ref<Product>({
-  id: undefined,
+  id: '',
   name: '',
   price: 0,
   category: 'Electronics',
@@ -150,7 +150,8 @@ const submitForm = async () => {
     }
     // Remove the id for new products to let Firestore generate it
     if (!initialProduct && 'id' in updatedProduct) {
-      delete updatedProduct.id // Now valid since id is optional
+      // @ts-expect-error - id is optional in Product type
+      delete updatedProduct.id
     }
     emit('submit', updatedProduct)
     formRef.value!.reset()
@@ -166,13 +167,11 @@ const { initialProduct } = defineProps<{
 <style scoped>
 .modern-card {
   border-radius: 12px;
-  background: linear-gradient(145deg, #ffffff, #f5f5f5);
 }
 
 .form-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #333;
   text-align: center;
   padding: 1rem;
 }

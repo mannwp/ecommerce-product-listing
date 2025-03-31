@@ -15,6 +15,8 @@
       <v-col v-for="product in products" :key="product.id" cols="12" sm="6" md="4">
         <product-card
           :product="product"
+          :average-rating="productStore.getAverageRating(product.id)"
+          :review-count="productStore.getReviewCount(product.id)"
           :is-admin="userRole === 'admin'"
           @edit="editProduct"
           @delete="deleteProductHandler"
@@ -36,23 +38,38 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useProductStore } from '../stores/productStore'
 import ProductCard from '../components/ProductCard.vue'
 import ProductForm from '../components/ProductForm.vue'
-// import { useI18n } from 'vue-i18n';
+import { useI18n } from 'vue-i18n'
 import { auth, db } from '../firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import { doc, onSnapshot, type Unsubscribe } from 'firebase/firestore'
 import type { Product } from '../types/product'
 
-// const { t } = useI18n();
+const { t } = useI18n()
 const productStore = useProductStore()
-const { products, fetchProducts, deleteProduct } = productStore
+const { products, fetchProducts, deleteProduct, fetchAllReviews } = productStore
 
 const userRole = ref<string | null>(null)
 let unsubscribeUserRole: Unsubscribe | null = null
 
 const showForm = ref(false)
 const selectedProduct = ref<Product | null>(null)
+let unsubscribeReviews: Array<() => void> = []
+const loading = ref(false)
+const error = ref<string | null>(null)
 
 onMounted(async () => {
+  loading.value = true
+  error.value = null
+  try {
+    await fetchProducts()
+    // Fetch reviews for all products
+    unsubscribeReviews = fetchAllReviews()
+  } catch (err) {
+    error.value = t('fetchProductsError')
+    console.error('Error fetching products:', err)
+  } finally {
+    loading.value = false
+  }
   await fetchProducts()
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -75,6 +92,7 @@ onMounted(async () => {
       userRole.value = null
       if (unsubscribeUserRole) {
         unsubscribeUserRole()
+        unsubscribeReviews.forEach((unsubscribe) => unsubscribe())
         unsubscribeUserRole = null
       }
     }
