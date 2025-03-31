@@ -1,63 +1,72 @@
 <!-- src/components/Navbar.vue -->
 <template>
-  <header
-    class="modern-header d-flex align-center border-b w-100"
-    :class="{ 'pa-4': $vuetify.display.smAndUp, 'pa-2': $vuetify.display.xs }"
-  >
-    <span class="text-h5 font-weight-bold text-primary">VueCart</span>
-    <v-spacer />
+  <header class="modern-header border-b w-100 d-flex align-center justify-space-between pa-4 px-16">
+    <span class="text-h5 font-weight-black text-primary">VueCart</span>
+    <!-- <v-spacer /> -->
     <nav
       class="d-flex align-center"
       :class="{ 'ga-6': $vuetify.display.smAndUp, 'ga-4': $vuetify.display.xs }"
     >
-      <div class="d-flex align-center">
+      <div class="d-flex align-center ga-2">
         <v-btn
+          v-if="currentUser"
           :to="{ name: 'home' }"
           variant="text"
-          class="modern-nav-btn"
+          active-color="primary"
+          class=""
           :class="{ 'text-body-1': $vuetify.display.smAndUp, 'text-body-2': $vuetify.display.xs }"
         >
           {{ $t('home') }}
         </v-btn>
         <v-btn
           v-if="userRole === 'admin'"
+          active-color="primary"
           :to="{ name: 'dashboard' }"
           variant="text"
-          class="modern-nav-btn"
+          class=""
           :class="{ 'text-body-1': $vuetify.display.smAndUp, 'text-body-2': $vuetify.display.xs }"
         >
           {{ $t('dashboard') }}
         </v-btn>
-        <v-btn
-          v-if="!currentUser"
-          :to="{ name: 'signup' }"
-          variant="text"
-          class="modern-nav-btn"
-          :class="{ 'text-body-1': $vuetify.display.smAndUp, 'text-body-2': $vuetify.display.xs }"
-        >
-          {{ $t('signUp') }}
-        </v-btn>
-        <v-btn
-          v-if="!currentUser"
-          :to="{ name: 'login' }"
-          variant="text"
-          class="modern-nav-btn"
-          :class="{ 'text-body-1': $vuetify.display.smAndUp, 'text-body-2': $vuetify.display.xs }"
-        >
-          {{ $t('login') }}
-        </v-btn>
-        <v-select
-          v-if="!currentUser"
-          v-model="currentLanguage"
-          :items="languageOptions"
-          item-title="title"
-          item-value="value"
-          label="Language"
-          variant="outlined"
-          class="language-select"
-        />
       </div>
+    </nav>
+    <div class="d-flex align-center ga-2">
+      <v-select
+        v-if="!currentUser"
+        v-model="currentLanguage"
+        :items="languageOptions"
+        item-title="title"
+        item-value="value"
+        label="Language"
+        variant="outlined"
+        class="mx-4 pa-0"
+        density="compact"
+        hide-details="auto"
+      />
+      <v-btn
+        v-if="!currentUser"
+        :to="{ name: 'signup' }"
+        active-color="primary"
+        variant="text"
+        class="modern-nav-btn"
+        :class="{ 'text-body-1': $vuetify.display.smAndUp, 'text-body-2': $vuetify.display.xs }"
+      >
+        {{ $t('signUp') }}
+      </v-btn>
+      <v-btn
+        v-if="!currentUser"
+        :to="{ name: 'login' }"
+        active-color="primary"
+        variant="text"
+        class="modern-nav-btn"
+        :class="{ 'text-body-1': $vuetify.display.smAndUp, 'text-body-2': $vuetify.display.xs }"
+      >
+        {{ $t('login') }}
+      </v-btn>
       <v-progress-circular v-if="loading" indeterminate color="primary" size="24" class="mr-4" />
+      <v-btn variant="text" icon class="modern-menu-btn" @click="toggleTheme">
+        {{ icon }}
+      </v-btn>
       <v-menu v-if="currentUser" offset-y transition="slide-y-transition">
         <template v-slot:activator="{ props }">
           <v-avatar v-bind="props" class="avatar-hover" :size="$vuetify.display.smAndUp ? 40 : 36">
@@ -106,12 +115,12 @@
             </v-menu>
           </v-list-item>
           <!-- Theme Toggle -->
-          <v-list-item>
+          <!-- <v-list-item>
             <v-btn variant="text" class="modern-menu-btn w-100" @click="toggleTheme">
               <span class="mr-2">{{ $t('theme') }}</span>
               {{ icon }}
             </v-btn>
-          </v-list-item>
+          </v-list-item> -->
           <!-- Logout -->
           <v-list-item>
             <v-btn
@@ -126,7 +135,7 @@
           </v-list-item>
         </v-list>
       </v-menu>
-    </nav>
+    </div>
   </header>
 </template>
 
@@ -145,7 +154,7 @@ import { doc, onSnapshot, type Unsubscribe } from 'firebase/firestore'
 import type { User } from 'firebase/auth'
 
 const theme = useTheme()
-const icon = ref('🌞')
+const icon = ref('🌙')
 const router = useRouter()
 
 const toggleTheme = () => {

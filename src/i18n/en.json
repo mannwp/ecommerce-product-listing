@@ -82,5 +82,9 @@
   "recentReview": "Recent Review",
   "reviewSubmitError": "Failed to submit review",
   "reviewSuccess": "Review submitted successfully",
-  "theme": "Theme"
+  "theme": "Theme",
+  "createAccount": "Create an account to get started",
+  "welcome": "Welcome to VueCart",
+  "discover": "Discover premium products at competitive prices.",
+  "viewDetails": "View Details"
 }

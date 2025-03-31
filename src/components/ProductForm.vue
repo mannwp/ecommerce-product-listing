@@ -6,8 +6,15 @@
     </v-card-title>
     <v-card-text>
       <v-form v-model="formValid" @submit.prevent="submitForm" ref="formRef">
-        <v-text-field v-model="form.name" :label="$t('name')" :rules="nameRules" required />
         <v-text-field
+          variant="outlined"
+          v-model="form.name"
+          :label="$t('name')"
+          :rules="nameRules"
+          required
+        />
+        <v-text-field
+          variant="outlined"
           v-model.number="form.price"
           :label="$t('price')"
           type="number"
@@ -15,6 +22,7 @@
           required
         />
         <v-select
+          variant="outlined"
           v-model="form.category"
           :items="translatedCategories"
           item-title="text"
@@ -24,11 +32,11 @@
           required
         />
         <v-file-input
+          variant="outlined"
           v-model="imageFiles"
           :label="$t('image')"
           accept="image/*"
           prepend-icon="mdi-camera"
-          variant="filled"
           multiple
           @update:modelValue="handleFileInput"
           :rules="computedImageRules"
@@ -39,6 +47,7 @@
           </v-col>
         </v-row>
         <v-select
+          variant="outlined"
           v-model="form.stockStatus"
           :items="translatedStockOptions"
           item-title="text"
@@ -47,12 +56,19 @@
           :rules="requiredRule"
           required
         />
-        <v-btn type="submit" color="success" class="w-100" :disabled="!formValid">
-          {{ initialProduct ? $t('editProduct') : $t('addProduct') }}
-        </v-btn>
-        <v-btn color="error" class="w-100 mt-2" @click="$emit('close')">
-          {{ $t('cancel') }}
-        </v-btn>
+        <div class="d-flex justify-end ga-2">
+          <v-btn
+            color="background"
+            class="text-capitalize border border-grey-darken-4 shadow-none"
+            elevation="0"
+            @click="$emit('close')"
+          >
+            {{ $t('cancel') }}
+          </v-btn>
+          <v-btn type="submit" color="primary" class="text-capitalize" elevation="0">
+            {{ initialProduct ? $t('editProduct') : $t('addProduct') }}
+          </v-btn>
+        </div>
       </v-form>
     </v-card-text>
   </v-card>
@@ -172,7 +188,8 @@ const { initialProduct } = defineProps<{
 .form-title {
   font-size: 1.5rem;
   font-weight: 600;
-  text-align: center;
+  letter-spacing: 0rem;
+  text-align: start;
   padding: 1rem;
 }
 

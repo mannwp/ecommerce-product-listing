@@ -1,6 +1,6 @@
 <!-- src/views/ProductDetails.vue -->
 <template>
-  <v-container class="modern-container">
+  <v-container class="modern-container mx-16">
     <h1 class="page-title">{{ $t('productDetails') }}</h1>
     <v-row v-if="loading">
       <v-col cols="12">
@@ -33,13 +33,13 @@
         </v-carousel>
       </v-col>
       <v-col cols="12" md="6">
-        <v-card class="product-details-card" elevation="4">
+        <v-card class="product-details-card border border-grey-darken-4">
           <v-card-title class="product-title">{{ product.name }}</v-card-title>
           <v-card-subtitle class="product-subtitle">
             ${{ product.price }} | {{ $t(product.category.toLowerCase()) }}
           </v-card-subtitle>
           <v-card-text>
-            <v-chip :class="product.stockStatus === 'In Stock' ? 'in-stock' : 'out-of-stock'">
+            <v-chip :class="product.stockStatus === 'In Stock' ? 'in-stock' : 'out-of-stock'" small>
               {{ $t(product.stockStatus === 'In Stock' ? 'inStock' : 'outOfStock') }}
             </v-chip>
             <!-- Enhanced Review Summary -->
@@ -85,7 +85,7 @@
 
       <!-- Review Submission Form (for logged-in users) -->
       <v-col cols="12">
-        <v-card class="modern-card mb-6" elevation="4">
+        <v-card class="modern-card mb-6 border border-grey-darken-4">
           <v-card-title class="text-h5 text-primary">
             {{ $t('addReview') }}
           </v-card-title>
@@ -109,7 +109,7 @@
                 v-model="reviewText"
                 :label="$t('yourReview')"
                 :rules="reviewRules"
-                outlined
+                variant="outlined"
                 rows="3"
                 color="primary"
                 class="mb-4"
@@ -120,7 +120,7 @@
                 type="submit"
                 color="primary"
                 class="w-100 modern-btn"
-                :disabled="!formValid || reviewLoading"
+                :disabled="reviewLoading"
                 :loading="reviewLoading"
               >
                 {{ $t('submitReview') }}
@@ -139,7 +139,7 @@
 
       <!-- Display Reviews -->
       <v-col cols="12">
-        <v-card class="modern-card" elevation="4">
+        <v-card class="modern-card border border-grey-darken-4">
           <v-card-title class="text-h5 text-primary">
             {{ $t('reviews') }} ({{ reviews.length }})
           </v-card-title>
@@ -353,9 +353,8 @@ onUnmounted(() => {
 <style scoped>
 /* Same styles as before */
 .modern-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
+  max-width: 1440px;
+  padding: 1rem 0;
 }
 
 .page-title {
@@ -366,7 +365,7 @@ onUnmounted(() => {
 }
 
 .product-details-card {
-  border-radius: 12px;
+  border-radius: 8px;
   transition: transform 0.3s ease;
 }
 
@@ -380,42 +379,35 @@ onUnmounted(() => {
 }
 
 .in-stock {
-  background: linear-gradient(90deg, #4caf50, #66bb6a);
-  color: white;
+  color: green;
+  font-weight: 400;
+  font-size: small;
+  border: 1px solid green;
+  padding: 0px;
 }
 
 .out-of-stock {
-  background: linear-gradient(90deg, #f44336, #ef5350);
-  color: white;
+  color: red;
+  font-weight: 400;
+  font-size: small;
+  border: 1px solid red;
 }
 
 .carousel-item {
-  border-radius: 12px;
+  border-radius: 8px;
 }
 
 .modern-card {
-  border-radius: 12px;
-  background: #ffffff;
+  border-radius: 8px;
   transition: transform 0.3s ease;
-}
-
-.modern-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .modern-btn {
   border-radius: 8px;
   text-transform: none;
-  font-weight: 600;
   font-size: 1rem;
-  padding: 0.75rem 1.5rem;
+  /* padding: 0.75rem 1.5rem; */
   transition: all 0.3s ease;
-}
-
-.modern-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .modern-snackbar {
@@ -427,7 +419,6 @@ onUnmounted(() => {
 }
 
 .review-item {
-  border-bottom: 1px solid #e0e0e0;
   padding: 1rem 0;
 }
 
@@ -437,12 +428,10 @@ onUnmounted(() => {
 
 /* Review Summary Styles */
 .review-summary {
-  border-top: 1px solid #e0e0e0;
   padding-top: 1rem;
 }
 
 .recent-review {
-  background-color: #f5f5f5;
   padding: 0.75rem;
   border-radius: 8px;
 }

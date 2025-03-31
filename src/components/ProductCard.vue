@@ -1,18 +1,22 @@
 <template>
-  <v-card class="product-card" elevation="4">
-    <v-img :src="product.images[0]" height="200" class="product-image" cover />
-    <v-card-title class="product-title">{{ product.name }}</v-card-title>
-    <v-card-subtitle class="product-subtitle">
-      <span class="font-weight-bold">${{ product.price }}</span> |
-      {{ $t(product.category.toLowerCase()) }}
-    </v-card-subtitle>
-    <v-card-text>
+  <v-card class="product-card border border-grey-darken-2">
+    <v-img :src="product.images[0]" height="300" class="product-image" cover />
+    <v-card-title class="product-title d-flex justify-space-between"
+      >{{ product.name }}
       <v-chip :class="product.stockStatus === 'In Stock' ? 'in-stock' : 'out-of-stock'" small>
         {{ $t(product.stockStatus === 'In Stock' ? 'inStock' : 'outOfStock') }}
-      </v-chip>
+      </v-chip></v-card-title
+    >
+    <v-card-title class="d-flex justify-space-between align-center">
+      <span class="font-weight-medium">${{ product.price }}</span>
+      <span class="text-grey text-subtitle-1">
+        {{ $t(product.category.toLowerCase()) }}
+      </span>
+    </v-card-title>
+    <v-card-text>
       <!-- Review Summary -->
       <div class="review-summary mt-2">
-        <div class="d-flex align-center">
+        <div class="d-flex align-center justify-center">
           <v-rating
             :model-value="averageRating"
             readonly
@@ -22,22 +26,37 @@
             length="5"
             size="18"
           />
-          <span class="ml-2 text-body-2">
+          <span class="ml-2 text-body-2 text-grey">
             {{ averageRating.toFixed(1) }} ({{ reviewCount }} {{ $t('reviews') }})
           </span>
         </div>
       </div>
     </v-card-text>
-    <v-card-actions v-if="isAdmin">
-      <v-btn color="primary" @click.stop="$emit('edit', product)" class="action-button">
+    <v-card-actions v-if="isAdmin" class="d-flex">
+      <v-btn
+        prepend-icon="mdi-pencil-outline"
+        @click.stop="$emit('edit', product)"
+        class="border border-grey-darken-4 text-capitalize flex-fill"
+        elevation="0"
+      >
         {{ $t('edit') }}
       </v-btn>
       <v-btn
         color="error"
+        prepend-icon="mdi-delete-outline"
         @click.stop="product.id ? $emit('delete', product.id) : null"
-        class="action-button"
+        class="border border-grey-darken-4 text-capitalize flex-fill"
+        elevation="0"
       >
         {{ $t('delete') }}
+      </v-btn>
+    </v-card-actions>
+    <v-card-actions v-else>
+      <v-btn
+        @click.stop="$emit('edit', product)"
+        class="w-100 bg-blue text-capitalize font-weight-medium"
+      >
+        {{ $t('viewDetails') }}
       </v-btn>
     </v-card-actions>
   </v-card>
@@ -65,13 +84,8 @@ const reviewCount = computed(() => props.reviewCount ?? 0)
 
 <style scoped>
 .product-card {
-  border-radius: 12px;
+  border-radius: 8px;
   transition: transform 0.3s ease;
-}
-
-.product-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .product-image {
@@ -91,13 +105,18 @@ const reviewCount = computed(() => props.reviewCount ?? 0)
 }
 
 .in-stock {
-  background: linear-gradient(90deg, #4caf50, #66bb6a);
-  color: white;
+  color: green;
+  font-weight: 400;
+  font-size: small;
+  border: 1px solid green;
+  padding: 0px;
 }
 
 .out-of-stock {
-  background: linear-gradient(90deg, #f44336, #ef5350);
-  color: white;
+  color: red;
+  font-weight: 400;
+  font-size: small;
+  border: 1px solid red;
 }
 
 .action-button {

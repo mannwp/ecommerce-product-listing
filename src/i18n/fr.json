@@ -79,5 +79,9 @@
   "fetchReviewsError": "Erreur lors de la récupération des avis",
   "notAuthenticated": "Vous devez être connecté pour soumettre un avis",
   "loginToReview": "Connectez-vous pour soumettre un avis",
-  "theme": "Thème"
+  "theme": "Thème",
+  "createAccount": "Créez un compte pour commencer",
+  "welcome": "Bienvenue sur VueCart",
+  "discover": "Découvrez des produits électroniques et accessoires haut de gamme à des prix compétitifs.",
+  "viewDetails": "Voir les détails"
 }

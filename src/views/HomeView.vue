@@ -1,8 +1,16 @@
 <!-- src/views/ProductListing.vue -->
 <template>
-  <v-container class="modern-container">
+  <v-container class="modern-container mx-16">
+    <div className="d-flex flex-column align-center text-center ga-2 py-10 ">
+      <h1 className="text-h4 font-weight-bold">{{ $t('welcome') }}</h1>
+      <p className="text-grey-darken-2">
+        {{ $t('discover') }}
+      </p>
+    </div>
     <h1 class="page-title">{{ $t('listing') }}</h1>
-    <product-filter v-model="filters" class="filter-section" />
+    <div class="d-flex justify-end w-100 align-end">
+      <product-filter v-model="filters" class="filter-section" />
+    </div>
     <v-row v-if="loading">
       <v-col cols="12">
         <v-progress-circular indeterminate color="primary" :size="50" class="d-block mx-auto" />
@@ -23,7 +31,7 @@
       </v-col>
     </v-row>
     <v-row v-else>
-      <v-col v-for="product in filteredProducts" :key="product.id" cols="12" sm="6" md="4">
+      <v-col v-for="product in filteredProducts" :key="product.id" cols="12" sm="6" md="4" lg="3">
         <router-link
           :to="{ name: 'product-details', params: { id: product.id } }"
           class="text-decoration-none"
@@ -101,9 +109,8 @@ onUnmounted(() => {
 <style scoped>
 /* Modern Container */
 .modern-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
+  max-width: 1440px;
+  padding: 1rem 0rem;
 }
 
 /* Page Title */

@@ -1,7 +1,7 @@
 <template>
   <div class="h-screen">
     <Navbar />
-    <div class="w-100 d-flex justify-center align-center">
+    <div class="w-100 d-flex justify-center">
       <router-view />
     </div>
   </div>

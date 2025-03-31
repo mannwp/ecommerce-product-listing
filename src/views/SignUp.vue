@@ -3,10 +3,17 @@
   <v-container class="modern-container">
     <v-row justify="center">
       <v-col cols="12" sm="8" md="6">
-        <v-card class="modern-card" elevation="6" :class="{ 'animate-card': true }">
-          <v-card-title class="form-title text-primary">
+        <v-card
+          class="modern-card border-grey-darken-2 border"
+          color="background"
+          :class="{ 'animate-card': true }"
+        >
+          <v-card-title class="form-title">
             {{ $t('signUp') }}
           </v-card-title>
+          <v-card-subtitle class="form-subtitle">
+            {{ $t('createAccount') }}
+          </v-card-subtitle>
           <v-card-text>
             <v-form v-model="formValid" @submit.prevent="signUp" ref="formRef">
               <v-text-field
@@ -15,9 +22,10 @@
                 type="email"
                 :rules="emailRules"
                 required
-                outlined
+                variant="outlined"
                 class="mb-4"
-                prepend-inner-icon="mdi-email"
+                hide-details="auto"
+                prepend-inner-icon="mdi-email-outline"
                 color="primary"
               />
               <v-text-field
@@ -26,26 +34,28 @@
                 type="password"
                 :rules="passwordRules"
                 required
-                outlined
+                variant="outlined"
                 class="mb-4"
-                prepend-inner-icon="mdi-lock"
+                hide-details="auto"
+                prepend-inner-icon="mdi-lock-outline"
                 color="primary"
               />
               <v-file-input
                 v-model="profilePicture"
                 :label="$t('profilePicture')"
                 accept="image/*"
-                prepend-icon="mdi-camera"
+                prepend-icon="mdi-image-plus-outline"
                 variant="outlined"
                 :rules="imageRules"
                 class="mb-4"
+                hide-details="auto"
                 color="primary"
               />
               <v-btn
                 type="submit"
-                color="primary"
-                class="w-100 modern-btn mb-4"
-                :disabled="!formValid || loading"
+                color="blue-accent-3"
+                class="w-100 mb-4 font-weight-medium text-capitalize"
+                :disabled="loading"
                 :loading="loading"
               >
                 {{ $t('signUp') }}
@@ -54,17 +64,36 @@
 
             <!-- Google Sign-Up Button -->
             <v-btn
-              color="secondary"
-              class="w-100 modern-btn"
+              color="background"
+              class="w-100 text-capitalize font-weight-medium border border-grey-darken-2"
               :loading="googleLoading"
               @click="signUpWithGoogle"
             >
-              <v-icon start>mdi-google</v-icon>
+              <v-icon start size="24"
+                ><svg class="mr-2 h-10 w-10" viewBox="0 0 24 24">
+                  <path
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    fill="#4285F4"
+                  ></path>
+                  <path
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    fill="#34A853"
+                  ></path>
+                  <path
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                    fill="#FBBC05"
+                  ></path>
+                  <path
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    fill="#EA4335"
+                  ></path>
+                  <path d="M1 1h22v22H1z" fill="none"></path></svg
+              ></v-icon>
               {{ $t('signUpWithGoogle') }}
             </v-btn>
 
             <div class="text-center mt-4">
-              <span class="text-body-2">
+              <span class="text-body-2 text-gray">
                 {{ $t('haveAccount') }}
                 <v-btn
                   :to="{ name: 'login' }"
@@ -248,21 +277,14 @@ const getGoogleErrorMessage = (errorCode: string) => {
 
 <style scoped>
 .modern-container {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 3rem 1.5rem;
-  background-color: #f5f5f5;
 }
 
 .modern-card {
-  border-radius: 16px;
-  background: #ffffff;
+  border-radius: 8px;
   transition: all 0.3s ease;
-}
-
-.modern-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .animate-card {
@@ -270,27 +292,21 @@ const getGoogleErrorMessage = (errorCode: string) => {
 }
 
 .form-title {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   text-align: center;
-  padding: 1.5rem 0;
+  padding: 1.5rem 0 0 0;
+  letter-spacing: 0px;
+}
+.form-subtitle {
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: center;
   letter-spacing: 0.5px;
 }
-
-.modern-btn {
-  border-radius: 8px;
-  text-transform: none;
-  font-weight: 600;
-  font-size: 1rem;
-  padding: 0.75rem 1.5rem;
-  transition: all 0.3s ease;
+.v-btn {
+  letter-spacing: 0rem;
 }
-
-.modern-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
 .modern-link-btn {
   text-transform: none;
   font-weight: 500;
@@ -299,10 +315,6 @@ const getGoogleErrorMessage = (errorCode: string) => {
 
 .modern-link-btn:hover {
   color: #1976d2; /* secondary color */
-}
-
-.modern-snackbar {
-  background: linear-gradient(90deg, #f44336, #ef5350) !important;
 }
 
 @keyframes fadeInUp {

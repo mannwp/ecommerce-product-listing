@@ -1,40 +1,40 @@
 <!-- src/components/ProductFilter.vue -->
 <template>
-  <v-row class="mb-4">
-    <v-col cols="12" sm="4">
-      <v-select
-        variant="outlined"
-        v-model="localFilters.category"
-        :items="categoryOptions"
-        item-title="title"
-        item-value="value"
-        :label="$t('filterByCategory')"
-        prepend-icon="mdi-filter"
-      />
-    </v-col>
-    <v-col cols="12" sm="4">
-      <v-select
-        variant="outlined"
-        v-model="localFilters.sortBy"
-        :items="sortByOptions"
-        item-title="title"
-        item-value="value"
-        :label="$t('sortBy')"
-        prepend-icon="mdi-sort"
-      />
-    </v-col>
-    <v-col cols="12" sm="4">
-      <v-select
-        variant="outlined"
-        v-model="localFilters.sortOrder"
-        :items="sortOrderOptions"
-        item-title="title"
-        item-value="value"
-        :label="$t('sortOrder')"
-        prepend-icon="mdi-sort-variant"
-      />
-    </v-col>
-  </v-row>
+  <!-- <v-row class="mb-0"> -->
+  <v-col cols="12" sm="2">
+    <v-select
+      variant="outlined"
+      v-model="localFilters.category"
+      :items="categoryOptions"
+      item-title="title"
+      density="compact"
+      item-value="value"
+      :label="$t('filterByCategory')"
+    />
+  </v-col>
+  <v-col cols="12" sm="2">
+    <v-select
+      variant="outlined"
+      v-model="localFilters.sortBy"
+      :items="sortByOptions"
+      item-title="title"
+      density="compact"
+      item-value="value"
+      :label="$t('sortBy')"
+    />
+  </v-col>
+  <v-col cols="12" sm="2">
+    <v-select
+      variant="outlined"
+      v-model="localFilters.sortOrder"
+      :items="sortOrderOptions"
+      item-title="title"
+      density="compact"
+      item-value="value"
+      :label="$t('sortOrder')"
+    />
+  </v-col>
+  <!-- </v-row> -->
 </template>
 
 <script setup lang="ts">

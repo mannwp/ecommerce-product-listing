@@ -1,18 +1,19 @@
 <template>
-  <v-container class="modern-container">
+  <v-container class="modern-container mx-16">
     <div class="d-flex justify-space-between">
       <h1 class="page-title">{{ $t('dashboard') }}</h1>
       <v-btn
         v-if="userRole === 'admin'"
-        color="success"
-        class="mb-4 add-button"
+        color="blue-darken-2"
+        prepend-icon="mdi-plus-circle-outline"
+        class="mb-4 text-capitalize"
         @click="showAddForm"
       >
         {{ $t('addProduct') }}
       </v-btn>
     </div>
     <v-row>
-      <v-col v-for="product in products" :key="product.id" cols="12" sm="6" md="4">
+      <v-col v-for="product in products" :key="product.id" cols="12" sm="6" md="4" lg="3">
         <product-card
           :product="product"
           :average-rating="productStore.getAverageRating(product.id)"
@@ -148,9 +149,8 @@ const closeForm = () => {
 
 <style scoped>
 .modern-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
+  max-width: 1440px;
+  padding: 1rem 0rem;
 }
 
 .page-title {
