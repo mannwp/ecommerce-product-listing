@@ -46,6 +46,16 @@
         >
           {{ $t('login') }}
         </v-btn>
+        <v-select
+          v-if="!currentUser"
+          v-model="currentLanguage"
+          :items="languageOptions"
+          item-title="title"
+          item-value="value"
+          label="Language"
+          variant="outlined"
+          class="language-select"
+        />
       </div>
       <v-progress-circular v-if="loading" indeterminate color="primary" size="24" class="mr-4" />
       <v-menu v-if="currentUser" offset-y transition="slide-y-transition">
